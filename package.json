@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "echarts": "^4.5.0",
+    "mpvue-echarts": "^0.3.2",
+    "vue-meta": "^2.2.2"
+  }
+}

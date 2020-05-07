@@ -1,0 +1,149 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	    {"path":"pages/login/login",      "style":{"navigationBarTitleText":"登录"}},
+		{"path":"pages/login/register",   "style":{"navigationBarTitleText":"注册"}},
+		{"path":"pages/login/forgive",   "style":{"navigationBarTitleText":"忘记密码"}},
+		{
+			"path":"pages/home/home",
+			"style":{
+				"navigationBarTitleText":"地图",
+				"permission":{
+					"scope.userLocation":{"desc":"您的位置信息将用于"} },
+				"app-plus":{
+					"titleNView":{
+						"buttons":[
+				            {
+							 "fontSize":"28px",
+							 "fontSrc":"/static/aliconfont.ttf",
+							 "text":"\ue608",
+							 "width":"50px"}
+						]
+					},
+					"bounce": "none"
+				}
+			}
+		},
+		{
+			"path":"pages/home/list/list",
+			"style":{
+				"navigationBarTitleText":"设备列表",
+				"enablePullDownRefresh":true,
+				"app-plus":{
+					"titleNView":{
+						"buttons":[
+							{
+							 "fontSize":"25px",
+							 "fontSrc":"/static/aliconfont.ttf",
+							 "text":"\ue6e0",
+							 "width":"50px"}
+						]
+					}
+				}
+			}
+		},
+		{"path":"pages/home/list/tree",    "style":{"navigationBarTitleText":"树形展示"}},
+		{"path":"pages/home/main/location","style":{"navigationBarTitleText":"位置追踪"}},
+		{"path":"pages/home/main/trail",   "style":{"navigationBarTitleText":"轨迹回放"}},
+		{"path":"pages/home/main/datatime","style":{"navigationBarTitleText":"查询轨迹"}},
+		
+		
+		
+		
+		{"path":"pages/more/more",        "style":{"navigationBarTitleText":"更多"}},
+		{"path":"pages/more/more_car",    "style":{"navigationBarTitleText":"更多"}}, 
+		{"path":"pages/more/chat",        "style":{"navigationBarTitleText":"微聊"},"app-plus": { "softinputMode": "adjustResize"}},
+		{"path":"pages/more/fence",       "style":{"navigationBarTitleText":"围栏列表"}},
+		{"path":"pages/more/fence-infor", "style":{"navigationBarTitleText":"围栏详情"}},
+		{"path":"pages/more/telnum",      "style":{"navigationBarTitleText":"电话本"}},
+		{"path":"pages/more/telnum-infor","style":{"navigationBarTitleText":"编辑联系人"}},
+		{"path":"pages/more/call",        "style":{"navigationBarTitleText":"通话"}},
+		{"path":"pages/more/heart",       "style":{"navigationBarTitleText":"健康"}},
+		{"path":"pages/more/sos",         "style":{"navigationBarTitleText":"SOS"}},
+		{"path":"pages/more/news",        "style":{"navigationBarTitleText":"通知管理"},"app-plus": { "softinputMode": "adjustResize" }},
+		{"path":"pages/more/health",      "style":{"navigationBarTitleText":"报警参数"}},
+		{"path":"pages/more/clock",       "style":{"navigationBarTitleText":"闹钟"}},
+		{"path":"pages/more/photo",       "style":{"navigationBarTitleText":"远程拍照"}},
+		{"path":"pages/more/page",        "style":{"navigationBarTitleText":"设备资料"}},
+		{"path":"pages/more/vcall",       "style":{"navigationBarTitleText":"视频聊天"}},
+		{"path":"pages/more/vcar",        "style":{"navigationBarTitleText":"视频监控"}},
+		{"path":"pages/more/video",       "style":{"navigationBarTitleText":"","app-plus":{"titleNView":false,"bounce": "none"}}},
+		{"path":"pages/more/search",      "style":{"navigationBarTitleText":"找设备"}},
+		{"path":"pages/more/switch",      "style":{"navigationBarTitleText":"功能开关"}},
+		{"path":"pages/more/reset",       "style":{"navigationBarTitleText":"远程重启"}},
+		{"path":"pages/more/close",       "style":{"navigationBarTitleText":"远程关机"}},
+		{"path":"pages/more/voice",       "style":{"navigationBarTitleText":"远程录音"}},
+		{"path":"pages/more/set",         "style":{"navigationBarTitleText":"设置"}},
+		{"path":"pages/more/work",        "style":{"navigationBarTitleText":"情景模式"}},
+		
+		
+		
+		
+		
+		{"path":"pages/new/new",          "style":{"navigationBarTitleText":"消息","enablePullDownRefresh":true}},
+		// {"path":"pages/video/video",      "style":{"navigationBarTitleText":"视频"}},
+		{"path":"pages/dispatch/dispatch","style":{"navigationBarTitleText":"派车",
+		    "app-plus":{
+					"titleNView":{
+						"buttons":[{
+							 "fontSize":"23px",
+							 "fontSrc":"/static/aliconfont.ttf",
+							 "text":"\ue619",
+							 "width":"60px"}
+						]}}}},
+		
+		
+		{"path": "pages/center/center",   "style":{"navigationBarTitleText":"个人中心"}},
+		{"path": "pages/center/user",     "style":{"navigationBarTitleText":"账户管理"}},
+		{"path": "pages/center/set",      "style":{"navigationBarTitleText":"通用"}},
+		{"path": "pages/center/code",     "style":{"navigationBarTitleText":"关于"}},
+		{"path": "pages/center/react",    "style":{"navigationBarTitleText":"反馈"}}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "图",
+		"navigationBarBackgroundColor": "#4685F8",
+		"backgroundColor": "#fbf9fe"
+	},
+	"tabBar": { 
+		"color": "#333333",
+		"selectedColor": "#108ee9",
+		"borderStyle": "black", 
+		"backgroundColor": "#ffffff",
+		"list": [{
+			"pagePath": "pages/home/home",
+			"iconPath": "static/home.png",
+			"selectedIconPath": "static/home-fill.png",
+			"text": "主页"
+		}, {
+			"pagePath": "pages/new/new",
+			"iconPath": "static/mail.png",
+			"selectedIconPath": "static/mail-fill.png",
+			"text": "消息"
+		}, {
+			"pagePath": "pages/dispatch/dispatch",
+			"iconPath": "static/dispatch.png",
+			"selectedIconPath": "static/dispatch-fill.png",
+			"text": "派车"
+		// }, {
+		// 	"pagePath": "pages/video/video",
+		// 	"iconPath": "static/video.png",
+		// 	"selectedIconPath": "static/video-fill.png",
+		// 	"text": "视频"
+		}, {
+			"pagePath": "pages/center/center",
+			"iconPath": "static/my.png",
+			"selectedIconPath": "static/my-fill.png",
+			"text": "我的"
+		}]
+	},
+	"condition" : { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [
+			{
+				"name": "", //模式名称
+				"path": "", //启动页面，必选
+				"query": "" //启动参数，在页面的onLoad函数里面得到
+			}
+		]
+	}
+}

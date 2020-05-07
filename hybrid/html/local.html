@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>轨迹回放</title>
+		<link rel="stylesheet" href="amap.css" />
+		<style type="text/css">
+			html,
+			body,
+			#container {
+				position: absolute;
+				top: 0;
+				bottom:0;
+				height: 100%;
+				width: 100%;
+			}
+			.input-card .btn {
+				margin-right: 1rem;
+				width: 6rem;
+			}
+			.input-card .btn:last-child {
+				margin-right: 0;
+			}
+			.title{
+				line-height: 1.9;
+				font-weight: 700;
+				font-size: 1.2rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<div class="input-card">
+			<h4 class="title">轨迹回放控制<span id="carname"></span></h4>
+			<div class="input-item">
+				<h4>时间 : <span id="patient_id"></span></h4>
+				<h4 style="position: absolute;left: 50%;">速度 : <span id="speed"></span><span>km/h</span></h4>
+			</div>
+			<div class="input-item2">
+				<h4 style="width:100px;">播放速度 : <span id="playspeed"></span></h4>
+				<img class="im" src="../../static/left.png" style="width: 60px;height: 60px;" onclick="jianspeed()">
+				<img class="im" id="img" src="../../static/star.png" style="width: 47px;height: 47px;" onclick="startAnimation()">
+				<img class="im" src="../../static/right.png" style="width: 60px;height: 60px;" onclick="addspeed()">
+				<img class="im" src="../../static/newstar.png" style="width: 51px;height: 51px;" onclick="newstartAnimation()">
+			</div>
+		</div>
+		<!-- ampa 的 SDK -->
+		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=eca47b2199b123d5a3d4e91667861b96"></script>
+		<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+		<!-- uni 的 SDK -->
+		<script type="text/javascript" src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js"></script>
+		<script type="text/javascript">
+			var lineArr =[];marker = {};kind=null;  
+			//初始化地图 
+			function initMap(){
+				return new Promise((reslove, reject) => {
+					//初始化地图,获取,解析guiji数据
+					var carname = plus.storage.getItem("carname");
+					kind = plus.storage.getItem("kind");
+					document.getElementById("carname").innerText =" —— "+carname;
+					var temp = plus.storage.getItem("guiji");
+					var guiji = JSON.parse(temp);
+					//遍历guiji,赋值给lineArr
+					guiji.forEach((item,i)=>{
+						var poi = {lng:item.lng,lat:item.lat};var point = new AMap.LngLat(poi.lng,poi.lat);point.time = item.time;point.speed = item.speed;lineArr.push(point)});
+					if(lineArr.length>1){reslove(lineArr)}else{reject(e)};
+				}).then((lineArr) => {
+				    //绘制地图,小车,开始/结束标记,折线,走过的折线,小车开动
+					var next = lineArr[lineArr.length - 1];
+				    var map = new AMap.Map("container",{resizeEnable: true,center: lineArr[0],zoom: 17,});
+					// marker = lineArr;
+					
+					var icon2 = new AMap.Icon({size: new AMap.Size(28,28),image:"../../static/start.png",imageSize: new AMap.Size(28,28)});
+					var icon3 = new AMap.Icon({size: new AMap.Size(28,28),image:"../../static/end.png",imageSize:new AMap.Size(28, 28)});
+				    var start = new AMap.Marker({map:map,position: lineArr[0],offset: new AMap.Pixel(-14.5,-27),icon:icon2,});
+					var end = new AMap.Marker({map: map,position: next,offset: new AMap.Pixel(-14.5,-27),icon:icon3});
+					if(kind=="person_gps"){
+						var icon1 = new AMap.Icon({size: new AMap.Size(24, 30),image:"../../static/pp.png",imageSize: new AMap.Size(24, 30)});
+						marker = new AMap.Marker({map:map,position:lineArr[0],offset:new AMap.Pixel(-12,-29),icon:icon1,});
+					}else{ 
+						var icon1 = new AMap.Icon({size: new AMap.Size(48, 24),image:"../../static/car1.png",imageSize: new AMap.Size(48, 24)});
+						marker = new AMap.Marker({map:map,position:lineArr[0],offset:new AMap.Pixel(-24,-12),icon:icon1,autoRotation:true,});
+					}
+					var polyline = new AMap.Polyline({map:map,path:lineArr,strokeColor:"#0099FF",strokeWeight:4});
+					var passedPolyline = new AMap.Polyline({map:map,strokeColor:"#33cc33",strokeWeight:4});
+					 
+					var len = null,location=null;
+					marker.on('moving',function(e){
+						// console.log(JSON.stringify(e));
+						len = e.passedPath.length;
+						location = e.passedPath[len-1];
+				    	passedPolyline.setPath(e.passedPath);
+				    	if (location.time) {
+				    		document.getElementById("patient_id").innerText = location.time;
+				    		document.getElementById("speed").innerText = location.speed;
+				    	}
+					});
+					map.setFitView();	
+				}).catch((e)=>{console.log(JSON.stringify(e))})
+			}
+			document.addEventListener("plusready",initMap,false); 
+			
+			//开始暂停,重新开始,加速播放,减速播放4个按钮,初始运动状态state为0,初始播放速度为1倍
+			var state = 0,selv = 1;
+			function startAnimation() {document.getElementById("playspeed").innerText = selv+"X";if (state == 0) {marker.moveAlong(lineArr, selv*1000);state = 1;img.src = '../../static/center.png';} else if (state == 1) {marker.pauseMove();state = -1;img.src = '../../static/star.png';} else if (state == -1) {marker.resumeMove();state = 1;img.src = '../../static/center.png';}};
+			function newstartAnimation() {marker.moveAlong(lineArr, selv*1000);state = 1;img.src = '../../static/center.png';document.getElementById("playspeed").innerText = selv+"X️️";};
+			// var selv = document.getElementById('h_id').options[document.getElementById('h_id').selectedIndex].value;
+			function jianspeed() {selv = selv/2;if(selv==0.125){selv = 0.25};document.getElementById("playspeed").innerText = selv+"X️";marker.moveAlong(lineArr, selv*1000);};
+			function addspeed() {selv = selv*2;if(selv==32){selv = 16};document.getElementById("playspeed").innerText = selv+"X️";marker.moveAlong(lineArr, selv*1000);};
+		</script>
+	</body>
+</html>

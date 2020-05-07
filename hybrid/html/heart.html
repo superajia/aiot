@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>健康数据</title>
+		<style type="text/css">
+			body{margin:0;background-color:#efefef;}
+		    .my-frame1{background-color:#fff;box-shadow:1px 1px 6px #aaa;} 
+			.my-cell0{padding:12px 30px 8px;height:28px;line-height:28px;text-align:center;font-size:17px;font-weight:700;border-bottom:0.3px solid #666;}
+			.my-cell{display:flex;padding:14px 30px;justify-content:space-between;align-items:center;font-size:17px;}
+		    .my-cell2{display:flex;padding:2px 10px 12px;justify-content:flex-end;font-size:15px;color:#808080;}
+			.my-cell4{display:flex;padding:14px 10px 0px;justify-content:flex-end;font-size:15px;color:#808080;}
+			.my-cell-but{height:16px;width:300px;position:relative;}
+			.btn{padding:5px 10px;font-size:17px;border-radius:6px;color:#fff;background-color:#108EE9;position:absolute;top:-28px;left:12px}
+		    .btn:active{background-color:rgba(16,142,233,0.5);}
+			.my-cell3{width:100%;height:300px;background-color:#fff;box-shadow:1px 1px 6px #aaa;margin-bottom:30px;position:relative;}
+		</style>
+	</head>
+	<body>
+		<div class="my-frame1">
+			<div class="my-cell0" id="name">名称</div>
+			<div class="my-cell"><span>血压(舒张压)</span><span id="l_pres">mmHg</span></div>
+			<div class="my-cell"><span>血压(收缩压)</span><span id="h_pres">mmHg</span></div>
+			<div class="my-cell"><span>心率</span><span id="heart">次/分钟</span></div>
+			<div class="my-cell"><span>步数</span><span id="step">步</span></div>
+		</div>
+		<div class="my-cell4" id="time">更新时间 : 0</div>
+		<div class="my-cell-but"><div class="btn" onclick="getNew()">健康数据实时监测</div></div> 
+		<div id="radar" style="width:100%;height:300px;background-color:#fff;box-shadow:1px 1px 6px #aaa;"></div>
+		<div class="my-cell2" id="time2">统计时间:</div>
+		<div id="line4" class="my-cell3"></div>
+		<div id="line2" class="my-cell3"></div>
+		<div id="line3" class="my-cell3"></div>
+		<script type="text/javascript" src="echarts.min.js"></script>
+		<script type="text/javascript"> 
+		    //获取时间函数 格式: 2019-01-01 23:59:59
+		    function getTime(type){var date = new Date();if(type=="start"){date.setTime(date.getTime()-24*60*60*7000)};let year = date.getFullYear();let month = date.getMonth() + 1;let day = date.getDate();let hour =  date.getHours();let minute =  date.getMinutes();let second =  date.getSeconds();month = month > 9 ? month : '0' + month;day = day > 9 ? day : '0' + day;hour = hour > 9 ? hour : '0' + hour;minute = minute > 9 ? minute : '0' + minute;second = second > 9 ? second : '0' + second;return `${year}-${month}-${day} ${hour}:${minute}:${second}`;};
+			var start = getTime("start");var end = getTime();var health =null;
+			//初始化图标 1.获取图表实例
+			var chart1 = echarts.init(document.getElementById('radar'));
+			var chart2 = echarts.init(document.getElementById('line2'));
+			var chart3 = echarts.init(document.getElementById('line3'));
+			var chart4 = echarts.init(document.getElementById('line4'));
+			//2.设置图表配置
+			var option1 = {
+				animation:true,
+				title:{text:' 健康数据雷达图',left:'10',top:7,textStyle:{fontSize:16}},
+			    radar: {
+					center:['48%','58%'],//中心点位置
+					radius:"70%",//半径大小
+			        name: {textStyle: {color: '#333',fontSize:14,padding: [6, 5],}},
+					//坐标轴
+			        indicator:[{name:'心率',max:200},{name:'舒张压',max:200},{name:'收缩压',max:200},{name:'运动步数',max:10000},{name:'舒眠质量',max:100},]},
+				//数据
+			    series: [{color:"#108ee9",name: '健康数据雷达图',type: 'radar',data : [{value:[0,0,0,0,0]}]}]
+			};
+			var option2 = {
+				tooltip: {trigger:'axis'},legend:{data:['心率'],top:10,right:40,textStyle:{fontSize:13,fontWeight:'bolder'}},
+				title:{text:'心率变化图',left:'37%',top:7,textStyle:{fontSize:16}},
+				dataZoom:[{show:true,realtime:true},{type:'inside',realtime:true}],
+				grid:{left:'12%',top:'20%'},
+				xAxis:[{type :'category',data:[]}],
+				yAxis:[{name:'心率(次/min)',type:'value'}],
+				series:[
+				    {type:'line',color:'#108ee9',smooth:true,name:'心率',symbol:'none',sampling:'average',//取消空心圆点
+				     lineStyle:{width:2},data:[]
+				}]
+			};
+			var option3 = {
+				tooltip: {trigger:'axis'},legend:{data:['舒张压','收缩压'],top:10,right:16,padding:[5,0],textStyle:{fontSize:13,fontWeight:'bolder'}},
+				title:{text:'血压变化图',left:'34%',top:7,textStyle:{fontSize:16}},
+				dataZoom:[{show:true,realtime:true},{type:'inside',realtime:true}],
+				grid:{left:'12%',top:'20%'},
+				xAxis:[{type :'category',data:[]}],
+				yAxis:[{name:'血压(mmHg)',type:'value'}],
+				series:[
+				    {type:'line',color:'#108ee9',smooth:true,name:'舒张压',symbol:'none',sampling:'average',//取消空心圆点
+				     lineStyle:{width:2},data:[]},
+					{type:'line',color:'#339933',smooth:true,name:'收缩压',symbol:'none',sampling:'average',//取消空心圆点
+					 lineStyle:{width:2},data:[]},
+				]
+			};
+			var option4 = {
+				tooltip: {trigger:'axis'},legend:{data:['步数'],top:10,right:40,textStyle:{fontSize:13,fontWeight:'bolder'}},
+				title:{text:'运动步数',left:'38%',top:7,textStyle:{fontSize:16}},
+				dataZoom:[{show:true,realtime:true},{type:'inside',realtime:true}],
+				grid:{left:'12%',top:'20%'},
+				xAxis:[{type :'category',data:[]}],
+				yAxis:[{name:'步数',type:'value'}],
+				series:[
+				    {type:'line',color:'#339933',smooth:true,name:'步数',symbol:'none',sampling:'average',//取消空心圆点
+				     lineStyle:{width:2},data:[]
+				}]
+			};
+			//3.显示图表
+			chart1.setOption(option1);
+			chart2.setOption(option2);
+			chart3.setOption(option3);
+			chart4.setOption(option4);
+			//获取最新数据
+			function getNew(){
+				var xhr = new plus.net.XMLHttpRequest();
+		        xhr.responseType ="json";xhr.timeout=8000;
+		        xhr.open("POST",health.url+'/device_set_person/'); 
+		        var data={"param_data":{"device_id":health.id,"set_command":"health_detect","set_value":"0"}};
+		        xhr.setRequestHeader("Content-Type","application/json");
+		        xhr.setRequestHeader("authorization",health.token);
+		        xhr.send(data);
+		        xhr.onreadystatechange = function(){
+		        	if(xhr.readyState==4){
+		        		if(xhr.status==200&&xhr.response.code==1000){
+		        			// var item = xhr.response.data.all_data[0] res l_pres;
+							if(xhr.response.data.msg=="set_param,ok!"){
+								var con = "命令下发成功，设备开始测量健康数据，请稍后..."
+							}else{var con = xhr.response.data.msg}
+		        		    // console.log(JSON.stringify(xhr));
+							plus.nativeUI.toast(con,{"duration":"long","verticalAlign":"center"});
+							var timeout1 =setTimeout(function(){getReq();},50000);
+							var timeout2 =setTimeout(function(){getReq();},80000);
+							
+		        		} else {
+		        			var error = ""; 
+		        			// console.log(JSON.stringify(xhr));
+		        			if(xhr.status=="200"){error = xhr.response.error}else{error=xhr.status}
+		        			plus.nativeUI.toast(error,{"duration":"long","verticalAlign":"center"}); 
+		        	    }
+					}
+		        }
+		    };
+			//plus就绪完成   
+			function initChart(){
+				//获取本地存储health
+				health = JSON.parse(plus.storage.getItem("health"));
+				getReq();
+			};
+			document.addEventListener("plusready",initChart,false);
+			function getReq(){
+				var xhr = new plus.net.XMLHttpRequest();
+			    xhr.responseType ="json";xhr.timeout=8000;
+			    xhr.open("GET",health.url+'/all_on_line/'); 
+			    // var data={"param_data":{"device_id":health.id,"set_command":"health_detect","set_value":"0"}};
+			    xhr.setRequestHeader("Content-Type","application/json");
+			    xhr.setRequestHeader("authorization",health.token);
+				xhr.setRequestHeader("key","all_on_line");
+				xhr.setRequestHeader("map","gd");
+			    // xhr.send(data);
+			    xhr.onreadystatechange = function(){
+			    	if(xhr.readyState==4){
+			    		if(xhr.status==200&&xhr.response.code==1000){
+			    			console.log("获取最新健康数据成功"); 
+			    			var all = xhr.response.data.all_device;
+			    				all.forEach((item, index) => {
+			    					if(item.device_id==health.id){
+										// console.log(item);
+			    						if(item.blood_pres){
+			    							document.getElementById("l_pres").innerText = item.blood_pres.l_pres+" mmHg";
+			    							document.getElementById("h_pres").innerText = item.blood_pres.h_pres+" mmHg";
+			    						}
+			    						document.getElementById("heart").innerText = item.heart_rate+" 次/分钟";
+			    						document.getElementById("step").innerText = item.step_count+" 步";
+										document.getElementById("name").innerText = item.name;
+			    						console.log("健康数据更新成功");
+										sendReq0();
+										sendReq1("step_count")
+										sendReq1("blood_pres")
+										sendReq1("heart_rate")
+									}
+			    				})
+			    		} else {
+			    			var error = ""; 
+			    			// console.log(JSON.stringify(xhr));
+			    			if(xhr.status=="200"){error = xhr.response.error}else{error=xhr.status}
+			    			plus.nativeUI.toast(error,{"duration":"long","verticalAlign":"center"}); 
+			    		}
+			    	}
+			    };
+			};
+			function sendReq0(){
+				var xhr = new plus.net.XMLHttpRequest();
+				xhr.responseType ="json";xhr.timeout=8000;
+				xhr.open("POST",health.url+'/person_statistics/'); 
+				var data={data:{device_list:[health.id],s_time:start,e_time:end}};
+				xhr.setRequestHeader("Content-Type","application/json");
+				xhr.setRequestHeader("authorization",health.token);
+				xhr.send(data);
+				xhr.onreadystatechange = function(){
+					if(xhr.readyState==4){
+						if(xhr.status==200&&xhr.response.code==1000){
+							console.log("获取雷达图成功");
+							var item = xhr.response.data.all_data[0];
+						    chart1.setOption({
+						    	radar:{
+						            indicator:[{name:'心率\n'+item.heart_rate,max:200},{name:'舒张压\n'+item.l_pres,max:200},{name:'收缩压\n'+item.h_pres,max:200},{name:'运动步数\n'+item.step_count,max:10000},{name:'舒眠质量\n'+item.sleep,max:100},]
+						        },
+						        series:[{data:[{value:[item.heart_rate,item.l_pres,item.h_pres,item.step_count,item.sleep]}]}]
+						    });
+							document.getElementById("time2").innerText = "统计时间 : "+start.slice(0,10)+" - "+end.slice(0,10);
+						} else {
+							var error = "";
+							// console.log(JSON.stringify(xhr));
+							if(xhr.status=="200"){error = xhr.response.error}else{error=xhr.status}
+							plus.nativeUI.toast(error,{"duration":"long","verticalAlign":"center"}); 
+						}
+					}
+				};
+			};
+			function sendReq1(what){
+				var xhr = new plus.net.XMLHttpRequest();
+				xhr.responseType ="json";xhr.timeout=8000; 
+				xhr.open("POST",health.url+"/person_history/"); 
+				var data={data:{what:what,device:health.id,s_time:start,e_time:end}};
+				xhr.setRequestHeader("Content-Type","application/json");
+				xhr.setRequestHeader("authorization",health.token);
+				xhr.send(data);
+				xhr.onreadystatechange = function(){
+					if(xhr.readyState==4){ 
+						if(xhr.status==200&&xhr.response.code==1000){
+							console.log("获取折线图成功");
+						    if(what=="heart_rate"){
+								var times = xhr.response.data[1];
+								document.getElementById("time").innerText = "更新时间 : "+times[times.length-1];
+								chart2.setOption({
+									xAxis:[{data:xhr.response.data[1].map(function(str){return str.replace(' ', '\n')})}],
+									series:[{data:xhr.response.data[0]}]
+								});
+							}else if(what=="blood_pres"){
+							    chart3.setOption({
+							    	xAxis:[{data:xhr.response.data[2].map(function(str){return str.replace(' ', '\n')})}],
+							    	series:[{data:xhr.response.data[1]},{data:xhr.response.data[0]},]
+							    });
+							}else if(what=="step_count"){
+								chart4.setOption({
+									xAxis:[{data:xhr.response.data[1].map(function(str){return str.replace(' ', '\n')})}],
+									series:[{data:xhr.response.data[0]}]
+								});
+							}
+						} else {
+							var error = "";
+							// console.log(JSON.stringify(xhr));
+							if(xhr.status=="200"){error = xhr.response.error}else{error=xhr.status}
+							plus.nativeUI.toast(error,{"duration":"long","verticalAlign":"center"}); 
+						}
+					}
+				};
+			}; 
+		</script>
+	</body>
+</html>
